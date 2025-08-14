@@ -1,0 +1,801 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AxioDog — Safe AI-agent transactions on Base</title>
+  <meta name="description" content="AxioDog is a policy engine + approval console for AI agents on Base. Simulate, explain, and policy-check each transaction before human approval.">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AxioDog — Safe AI-agent transactions on Base">
+  <meta property="og:description" content="AxioDog is a policy engine + approval console for AI agents on Base. Simulate, explain, and policy-check each transaction before human approval.">
+  <meta property="og:image" content="img/axiodog-logo.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="AxioDog — Safe AI-agent transactions on Base">
+  <meta property="twitter:description" content="AxioDog is a policy engine + approval console for AI agents on Base. Simulate, explain, and policy-check each transaction before human approval.">
+  <meta property="twitter:image" content="img/axiodog-logo.png">
+  <style>
+    :root {
+      --bg: #0a0f1e;
+      --fg: #ffffff;
+      --muted: #94a3b8;
+      --accent: #4cc9f0;
+      --accent-2: #00d2ff;
+      --card: #ffffff;
+      --card-dark: #0f172a;
+      --border: #e2e8f0;
+      --border-dark: #223058;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --gradient-primary: linear-gradient(135deg, #1b48ff, #00d2ff);
+      --gradient-secondary: linear-gradient(135deg, #4cc9f0, #10b981);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      --shadow-hover: 0 16px 64px rgba(0, 0, 0, 0.16);
+      --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 15, 30, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-dark);
+      z-index: 100;
+      padding: 16px 0;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--fg);
+    }
+    
+    .nav-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .nav-links a {
+      color: var(--muted);
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .nav-links a:hover {
+      color: var(--fg);
+    }
+    
+    .nav-cta {
+      display: flex;
+      gap: 12px;
+    }
+    
+    /* Hero Section */
+    .hero {
+      padding: 120px 20px 80px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(76, 201, 240, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(76, 201, 240, 0.1);
+      border: 1px solid rgba(76, 201, 240, 0.3);
+      border-radius: 24px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+    
+    .hero h1 {
+      font-size: clamp(48px, 6vw, 80px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 0 0 24px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    
+    .hero .subtitle {
+      font-size: clamp(20px, 3vw, 28px);
+      color: var(--muted);
+      margin: 0 0 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--fg);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--fg);
+    }
+    
+    /* Features Grid */
+    .features {
+      padding: 80px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    
+    .section-header h2 {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      margin: 0 0 16px;
+      color: var(--fg);
+    }
+    
+    .section-header p {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 32px;
+      margin-bottom: 60px;
+      justify-items: center;
+    }
+    
+    .feature-card {
+      background: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(76, 201, 240, 0.3);
+    }
+    
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .feature-card h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: var(--fg);
+    }
+    
+    .feature-card p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+    
+    /* Architecture Section */
+    .architecture {
+      padding: 80px 20px;
+      background: rgba(16, 25, 54, 0.3);
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+    
+    .architecture-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    
+    .architecture-content h2 {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      margin: 0 0 20px;
+      color: var(--fg);
+    }
+    
+    .architecture-content p {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+    
+    .architecture-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .architecture-list li {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    
+    .architecture-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .architecture-list .icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    
+    .architecture-list .content {
+      flex: 1;
+    }
+    
+    .architecture-list .content strong {
+      color: var(--fg);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    .architecture-list .content span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .architecture-visual {
+      background: rgba(76, 201, 240, 0.05);
+      border: 1px solid rgba(76, 201, 240, 0.2);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .flow-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .flow-step {
+      background: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+    }
+    
+    .flow-step::after {
+      content: '↓';
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--accent);
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .flow-step:last-child::after {
+      display: none;
+    }
+    
+    /* Sidebar Info */
+    .sidebar-grid {
+      padding: 80px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 60px;
+    }
+    
+    .main-content {
+      background: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 20px;
+      padding: 40px;
+    }
+    
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    
+    .sidebar-card {
+      background: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    
+    .sidebar-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 16px;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .sidebar-card .icon {
+      font-size: 18px;
+    }
+    
+    .budget-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    
+    .budget-item:last-child {
+      border-bottom: none;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    
+    /* Footer */
+    footer {
+      background: rgba(10, 15, 30, 0.8);
+      border-top: 1px solid var(--border-dark);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .architecture-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .sidebar-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .hero-cta {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+      }
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .feature-card {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .feature-card:nth-child(2) { animation-delay: 0.1s; }
+    .feature-card:nth-child(3) { animation-delay: 0.2s; }
+    .feature-card:nth-child(4) { animation-delay: 0.3s; }
+    
+    /* Utilities */
+    .text-center { text-align: center; }
+    .mb-0 { margin-bottom: 0; }
+    .mt-4 { margin-top: 24px; }
+    .text-muted { color: var(--muted); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="img/axiodog-logo.png" alt="AxioDog Logo">
+        AxioDog
+    </div>
+      <ul class="nav-links">
+        <li><a href="#features" aria-label="Navigate to features section">Features</a></li>
+        <li><a href="#architecture" aria-label="Navigate to architecture section">Architecture</a></li>
+        <li><a href="#roadmap" aria-label="Navigate to roadmap section">Roadmap</a></li>
+        <li><a href="#contact" aria-label="Navigate to contact section">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#demo" class="btn btn-secondary" aria-label="View live demo of AxioDog">View Demo</a>
+        <a href="https://github.com/sengar23/axiodog" target="_blank" class="btn btn-primary" aria-label="View AxioDog on GitHub">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="badge">
+      Open-source policy engine for Base
+    </div>
+    <h1>Keep AI agents safe on-chain</h1>
+    <p class="subtitle">
+      AxioDog makes AI-driven transactions on Base safe, explainable, and under your control — simulate, check policy, and approve before anything hits the blockchain.
+    </p>
+    <div class="hero-cta">
+      <a href="#demo" class="btn btn-primary" aria-label="View live demo of AxioDog policy engine">
+        View Live Demo
+      </a>
+      <a href="#features" class="btn btn-secondary" aria-label="Learn more about AxioDog features">
+        Learn More
+      </a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="section-header">
+      <h2>The complete safety stack for AI agents</h2>
+      <p>Everything you need to deploy AI agents safely on blockchain with confidence</p>
+    </div>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>PolicyAccount (ERC-4337)</h3>
+        <p>Smart account with configurable rules that stop unsafe transactions before they happen: spend caps, allow-lists, time windows, and optional human co-sign.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Agent SDK</h3>
+        <p>Drop-in TypeScript integration for agent frameworks (AgentKit, LangChain). Every action runs through simulation, plain-English explanation, and policy checks.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">👀</div>
+        <h3>Review Console</h3>
+        <p>Human-readable decision hub. See simulations, risk checks, and context; then approve or reject with one click. Built with OnchainKit for seamless UX.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">💨</div>
+        <h3>Gasless Onboarding</h3>
+        <p>Paymaster/Bundler integration sponsors first transactions, removing gas barriers for non-crypto users. Time-to-first-tx: under 90 seconds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Now Section -->
+  <section class="why-now" style="padding: 80px 20px; background: rgba(16, 25, 54, 0.2); border-top: 1px solid var(--border-dark);">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <div class="section-header">
+        <h2>Why now?</h2>
+        <p>AI agents are becoming mainstream, but they need safety rails to operate at scale</p>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; margin-top: 60px;">
+        <div style="background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 32px; text-align: left;">
+          <div style="width: 48px; height: 48px; background: var(--gradient-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px;">📈</div>
+          <h3 style="color: var(--fg); margin: 0 0 12px;">Explosive AI agent growth</h3>
+          <p style="color: var(--muted); margin: 0;">Agent frameworks like AgentKit, LangChain, and AutoGPT are seeing massive adoption, but lack standardized safety layers for blockchain interactions.</p>
+        </div>
+        
+        <div style="background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 32px; text-align: left;">
+          <div style="width: 48px; height: 48px; background: var(--gradient-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px;">💰</div>
+          <h3 style="color: var(--fg); margin: 0 0 12px;">High-stakes transactions</h3>
+          <p style="color: var(--muted); margin: 0;">As agents handle larger transactions and manage more funds, the cost of errors grows exponentially. One mistake can drain entire treasuries.</p>
+        </div>
+        
+        <div style="background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 32px; text-align: left;">
+          <div style="width: 48px; height: 48px; background: var(--gradient-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px;">🏗️</div>
+          <h3 style="color: var(--fg); margin: 0 0 12px;">Base ecosystem momentum</h3>
+          <p style="color: var(--muted); margin: 0;">Base's focus on practical applications and Coinbase's backing make it the ideal launch platform for enterprise-grade AI agent safety infrastructure.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Section -->
+  <section class="architecture" id="architecture">
+    <div class="architecture-container">
+      <div class="architecture-content">
+        <h2>Built for developers, secured by design</h2>
+        <p>AxioDog provides a comprehensive architecture that separates policy enforcement from execution, giving you maximum flexibility while maintaining security.</p>
+        
+                <ul class="architecture-list">
+          <li>
+            <div class="icon">📄</div>
+            <div class="content">
+              <strong>PolicyAccount</strong>
+              <span>ERC-4337 smart account with configurable policies</span>
+            </div>
+          </li>
+          <li>
+            <div class="icon">📚</div>
+            <div class="content">
+              <strong>PolicyRegistry</strong>
+              <span>Versioned policy store</span>
+            </div>
+          </li>
+          <li>
+            <div class="icon">🔧</div>
+            <div class="content">
+              <strong>@axiodog/sdk</strong>
+              <span>TypeScript SDK for agent integration</span>
+            </div>
+          </li>
+          <li>
+            <div class="icon">🌐</div>
+            <div class="content">
+              <strong>Review Console</strong>
+              <span>Next.js + OnchainKit approval workflows</span>
+            </div>
+          </li>
+          <li>
+            <div class="icon">⚡</div>
+            <div class="content">
+              <strong>Base Network</strong>
+              <span>Primary deployment with Paymaster support</span>
+            </div>
+          </li>
+      </ul>
+      </div>
+      
+      <div class="architecture-visual">
+        <div class="flow-diagram">
+          <div class="flow-step">
+            <strong>Agent proposes action</strong>
+            <div class="text-muted">LLM/AgentKit</div>
+          </div>
+          <div class="flow-step">
+            <strong>Simulate & explain</strong>
+            <div class="text-muted">plain-English results</div>
+          </div>
+          <div class="flow-step">
+            <strong>Check policy</strong>
+            <div class="text-muted">caps, allow-lists, time windows</div>
+          </div>
+          <div class="flow-step">
+            <strong>Human approval</strong>
+            <div class="text-muted">review with context</div>
+          </div>
+          <div class="flow-step">
+            <strong>Safe execution</strong>
+            <div class="text-muted">PolicyAccount on Base</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </section>
+
+  <!-- Main Content + Sidebar -->
+  <section class="sidebar-grid" id="roadmap">
+    <div class="main-content">
+      <h2>Why teams need AxioDog</h2>
+      <p>Without guardrails, AI agents can unintentionally drain wallets, interact with malicious contracts, or break compliance rules. AxioDog adds a standard, chain-native safety layer so every AI-initiated transaction is simulated, explained, policy-checked, and human-approved before execution.</p>
+      
+      <h3 id="demo">Live Demo</h3>
+      <p class="text-muted">Experience AxioDog's policy engine protecting real transactions:</p>
+      <a href="https://ranjeetsengar.com/axiodog/demo.mp4" target="_blank" rel="noopener" class="btn btn-primary mt-4" aria-label="View live demo of AxioDog protecting transactions">
+        Demo video →
+      </a>
+    </div>
+    
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <h3><span class="icon">🗓️</span>Project Timeline</h3>
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <strong>M1 - Core Engine</strong>
+            <span class="text-muted">3 weeks</span>
+          </div>
+          <div class="text-muted" style="font-size: 14px; margin-bottom: 12px;">Smart contracts, basic console, testnet demo</div>
+          
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <strong>M2 - Paymaster + Logs</strong>
+            <span class="text-muted">3 weeks</span>
+          </div>
+          <div class="text-muted" style="font-size: 14px; margin-bottom: 12px;">Gasless flows, audit trail, comprehensive docs</div>
+          
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <strong>M3 - Merchant Demo</strong>
+            <span class="text-muted">3 weeks</span>
+          </div>
+          <div class="text-muted" style="font-size: 14px;">Subscriptions, retries, analytics dashboard</div>
+        </div>
+      </div>
+      
+      <div class="sidebar-card">
+        <h3><span class="icon">📊</span>Success Metrics</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="padding: 8px 0; border-bottom: 1px solid var(--border-dark);">
+            <strong>≥10</strong> external integrations
+          </li>
+          <li style="padding: 8px 0; border-bottom: 1px solid var(--border-dark);">
+            <strong>≥1,000</strong> policy-protected transactions
+          </li>
+          <li style="padding: 8px 0; border-bottom: 1px solid var(--border-dark);">
+            <strong>≥100</strong> risky actions blocked
+          </li>
+          <li style="padding: 8px 0;">
+            <strong>&lt;90s</strong> time-to-first-transaction
+          </li>
+      </ul>
+      </div>
+      
+      
+      
+      <div class="sidebar-card" id="contact">
+        <h3><span class="icon">📧</span>Contact</h3>
+        <p><strong>Email:</strong> <a href="mailto:ranjeet.sengar19@gmail.com" style="color: var(--accent);">ranjeet.sengar19@gmail.com</a></p>
+        <p><strong>License:</strong> MIT / Apache-2.0 dual license</p>
+        <p class="text-muted">Building the standard safety layer for AI-agent transactions</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>🔓 <strong>AxioDog</strong> is open-source (MIT/Apache-2.0) • © 2025</p>
+      <p class="text-muted">The standard safety layer between AI agents and blockchain transactions</p>
+    </div>
+  </footer>
+</body>
+</html>
