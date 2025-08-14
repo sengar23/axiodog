@@ -53,30 +53,31 @@ AxioDog makes agent transactions **safe, explainable, and controllable** before 
 
 > Post-MVP: risk oracles integration (e.g., slippage/depeg), attestation hooks, policy template marketplace.
 
- ## CDP Integrations (Base)
-	•	Wallet SDK — connect/sign userOps from the console.
-	•	AgentKit — bridge agent intents to AxioDog SDK.
-	•	Onramp API — optional fiat → USDC flow embedded in onboarding.
-	•	Swap API — quotes + execution bounded by policy (slippage cap, allow-lists).
-	•	Paymaster/Bundler — sponsor first transactions; restrict sponsorship to approved userOps.
+## CDP Integrations (Base)
+- **Wallet SDK** — connect/sign userOps from the console.
+- **AgentKit** — bridge agent intents to AxioDog SDK.
+- **Onramp API** — optional fiat → USDC flow embedded in onboarding.
+- **Swap API** — quotes + execution bounded by policy (slippage cap, allow-lists).
+- **Paymaster/Bundler** — sponsor first transactions; restrict sponsorship to approved userOps.
 
 
 ## Security Model
 
-Threats & Mitigations
-	•	Bypass policy: all writes go through PolicyAccount; optional EIP-1271 co-sign; Paymaster only sponsors approved ops.
-	•	Phishing/malicious targets: allow-lists + explorer/ENS labels; optional risk feeds post-MVP.
-	•	Abuse of caps: per-token rolling caps; emergency lock.
-	•	Log tampering: hash logs; IPFS pinning; include CID in on-chain events.
+### Threats & Mitigations
+- **Bypass policy:** all writes go through PolicyAccount; optional EIP-1271 co-sign; Paymaster only sponsors approved ops.
+- **Phishing/malicious targets:** allow-lists + explorer/ENS labels; optional risk feeds post-MVP.
+- **Abuse of caps:** per-token rolling caps; emergency lock.
+- **Log tampering:** hash logs; IPFS pinning; include CID in on-chain events.
 
-Operational
-	•	Principle of least privilege for API keys; rotate regularly.
-	•	CI checks (lint, typecheck, tests, slither).
+### Operational
+- **Principle of least privilege** for API keys; rotate regularly.
+- **CI checks** (lint, typecheck, tests, slither).
 
 ## Milestones & Acceptance
-	•	M1 — Core rails (3 wks)
-Contracts compiled & tested; Queue + Request Detail pages; Base Sepolia demo; >85% unit coverage for policy logic.
-	•	M2 — Gasless + logs (3 wks)
-Paymaster wired; two end-to-end flows (send USDC, swap with cap) pass; docs/quickstarts live.
-	•	M3 — Merchant flows (3 wks)
-Subscriptions + retries; CLI for policy updates; 3 external devs complete quickstart unaided.
+
+- **M1 — Core rails (3 wks)**  
+  Contracts compiled & tested; Queue + Request Detail pages; Base Sepolia demo; >85% unit coverage for policy logic.
+- **M2 — Gasless + logs (3 wks)**  
+  Paymaster wired; two end-to-end flows (send USDC, swap with cap) pass; docs/quickstarts live.
+- **M3 — Merchant flows (3 wks)**  
+  Subscriptions + retries; CLI for policy updates; 3 external devs complete quickstart unaided.
