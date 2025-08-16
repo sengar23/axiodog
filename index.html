@@ -177,6 +177,28 @@
       margin-top: 40px;
     }
     
+    .hero-screenshot {
+      margin-top: 60px;
+      display: flex;
+      justify-content: center;
+      perspective: 1000px;
+    }
+    
+    .screenshot-image {
+      max-width: 100%;
+      width: 900px;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: var(--shadow-dark);
+      transition: all 0.4s ease;
+      transform: rotateX(0deg) rotateY(0deg) scale(1);
+    }
+    
+    .screenshot-image:hover {
+      transform: rotateX(8deg) rotateY(-2deg) scale(1.1);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+    }
+    
     .btn {
       display: inline-flex;
       align-items: center;
@@ -517,6 +539,21 @@
         max-width: 300px;
         justify-content: center;
       }
+      
+      .hero-screenshot {
+        margin-top: 40px;
+        padding: 0 10px;
+      }
+      
+      .screenshot-image {
+        width: 100%;
+        max-width: 500px;
+        transform: rotateX(0deg) rotateY(0deg) scale(1);
+      }
+      
+      .screenshot-image:hover {
+        transform: rotateX(4deg) rotateY(-1deg) scale(1.1);
+      }
     }
     
     /* Animations */
@@ -552,7 +589,7 @@
   <nav>
     <div class="nav-container">
       <div class="nav-logo">
-        <img src="../img/axiodog-logo.png" alt="AxioDog Logo">
+        <img src="./img/axiodog-logo.png" alt="AxioDog Logo">
         AxioDog
     </div>
       <ul class="nav-links">
@@ -584,6 +621,11 @@
       <a href="#features" class="btn btn-secondary" aria-label="Learn more about AxioDog features">
         Learn More
       </a>
+    </div>
+    
+    <!-- Product Screenshot -->
+    <div class="hero-screenshot">
+      <img src="./img/AxioDog-screen-1.jpg" alt="AxioDog Console Screenshot" class="screenshot-image">
     </div>
   </section>
 
